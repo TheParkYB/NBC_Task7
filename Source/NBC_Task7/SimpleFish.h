@@ -37,6 +37,9 @@ public:
 	void PlayerMouseMove(const FInputActionValue& value);
 
 private:
+	const float MAX_ANGLE = 90.0F;//수평 회전 이외의 모든 회전은 이 값이 최대
+	const float MIN_ANGLE = -90.0F;//수평 회전 이외의 모든 회전은 이 값이 최저
+	
 	//수평 이동 입력
 	UPROPERTY(EditAnywhere, Category = "Input Action", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UInputAction> moveAction;
@@ -86,4 +89,7 @@ private:
 	
 	//매 Tick마다 기록된 DeltaTime;
 	float deltaTime;
+
+	//내부에서 계산하는 회전값
+	FVector innerRotationVector;
 };

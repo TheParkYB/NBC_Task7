@@ -27,6 +27,7 @@ void ASimpleFish::BeginPlay()
 {
 	Super::BeginPlay();
 	startZ = GetActorLocation().Z;
+	innerRotationVector = FVector::ZeroVector;
 }
 
 void ASimpleFish::Tick(float DeltaTime)
@@ -73,26 +74,30 @@ void ASimpleFish::PlayerMove(const struct FInputActionValue& value)
 	float deltaSpeed = moveSpeed * deltaTime;
 	
 	//좌우 이동
-	AddMovementInput(GetActorRightVector(), moveValue.X * deltaSpeed);
+	AddActorLocalOffset(FVector::RightVector * moveValue.X * deltaSpeed);
 
 	//앞뒤 이동
-	AddMovementInput(GetActorForwardVector(), moveValue.Y * deltaSpeed);
+	AddActorLocalOffset(FVector::ForwardVector * moveValue.Y * deltaSpeed);
 }
 
 void ASimpleFish::PlayerVerticalMove(const struct FInputActionValue& value)
 {
 	//입력된 값을 float로 변경하고 델타 타임과 곱하기
 	const float deltaSpeed = value.Get<float>() * moveSpeed * deltaTime;
-	//기울이기
-	AddMovementInput(GetActorUpVector(), deltaSpeed);
+	//수직 이동
+	AddActorLocalOffset(FVector::UpVector * deltaSpeed);
 }
 
 void ASimpleFish::PlayerRolling(const struct FInputActionValue& value)
 {
 	//입력된 값을 float로 변경하고 델타 타임과 곱하기
 	const float deltaSpeed = value.Get<float>() * rollingSpeed * deltaTime;
-	//수직 이동
-	AddControllerRollInput(deltaSpeed);
+	
+	//각도 제한
+	innerRotationVector += FVector(0, 0, deltaSpeed);
+	innerRotationVector.Z = FMath::Clamp(innerRotationVector.Z, MIN_ANGLE, MAX_ANGLE);
+	//기울이기
+	SetActorRelativeRotation(FRotator(innerRotationVector.X, innerRotationVector.Y, innerRotationVector.Z));
 }
 
 void ASimpleFish::PlayerMouseMove(const FInputActionValue& value)
@@ -103,10 +108,11 @@ void ASimpleFish::PlayerMouseMove(const FInputActionValue& value)
 	//회전 속도 * 델타 타임
 	float deltaSpeed = lookSpeed * deltaTime;
 
-	//마우스 횡 이동
-	AddControllerYawInput(moveValue.X * deltaSpeed);
+	//회전 방향 (수직 각도 제한)
+	innerRotationVector += FVector(moveValue.Y * deltaSpeed, moveValue.X * deltaSpeed, 0);
+	innerRotationVector.X = FMath::Clamp(innerRotationVector.X, MIN_ANGLE, MAX_ANGLE);
 
-	//마우스 종 이동 (마우스가 위로 이동하면 시점이 위로가야함)
-	AddControllerPitchInput(moveValue.Y * deltaSpeed);
+	//마우스 이동을 따른다.
+	SetActorRelativeRotation(FRotator(innerRotationVector.X, innerRotationVector.Y, innerRotationVector.Z));
 }
 
