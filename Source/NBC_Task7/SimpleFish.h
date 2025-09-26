@@ -24,20 +24,34 @@ public:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	//이동
+	//수평 이동
 	void PlayerMove(const struct FInputActionValue& value);
+
+	//수직 이동
+	void PlayerVerticalMove(const struct FInputActionValue& value);
+
+	//기울이기
+	void PlayerRolling(const struct FInputActionValue& value);
 
 	//마우스 이동
 	void PlayerMouseMove(const FInputActionValue& value);
 
 private:
-	//이동 입력
+	//수평 이동 입력
 	UPROPERTY(EditAnywhere, Category = "Input Action", meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UInputAction> moveAction;
 
+	//수직 이동 입력
+	UPROPERTY(EditAnywhere, Category = "Input Action", meta = (AllowPrivateAccess = true))
+	TObjectPtr<class UInputAction> upAndDownAction;
+	
 	//마우스 이동 입력
 	UPROPERTY(EditAnywhere, Category = "Input Action", meta = (AllowPrivateAccess = true))
 	TObjectPtr<UInputAction> lookAction;
+
+	//기울기 입력
+	UPROPERTY(EditAnywhere, Category = "Input Action", meta = (AllowPrivateAccess = true))
+	TObjectPtr<UInputAction> rollingAction;
 
 	//이동 속도
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
@@ -46,6 +60,10 @@ private:
 	//회전 속도
 	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
 	float lookSpeed;
+
+	//구르기 속도
+	UPROPERTY(EditAnywhere, Category = "Movement", meta = (AllowPrivateAccess = true))
+	float rollingSpeed;
 	
 	//루트가 될 캡슐 컴포넌트
 	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = true))
@@ -63,6 +81,9 @@ private:
 	UPROPERTY(editAnywhere, meta = (AllowPrivateAccess = true))
 	UCameraComponent* camera;
 
+	//시작 높이
+	float startZ;
+	
 	//매 Tick마다 기록된 DeltaTime;
 	float deltaTime;
 };
